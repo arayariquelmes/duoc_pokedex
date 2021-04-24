@@ -16,7 +16,17 @@ tinymce.init({
   });
   
   const pokemones = []; //Definir un arreglo en javascript
-  
+  const eliminar  = function(){
+    
+    //1. Saber que boton fue el que se apreto
+    //2. Sacar el nro del boton
+    let nro = this.nro;
+    //3. Eliminar el pokemon de la lista
+    pokemones.splice(nro,1);
+    //4. Recargar la tabla
+    cargarTabla();
+  };
+
   const cargarTabla  = ()=>{
      //1. Una referencia a la tabla
      let tbody = document.querySelector("#tbody-pokemon");
@@ -36,12 +46,47 @@ tinymce.init({
        let tdAcciones = document.createElement("td");
 
        tdNombre.innerText = p.nombre;
-       //TODO: Mostrar el icono, no el numero!
-       tdTipo.innerText = p.tipo;
-       //TODO: Esto no va a funcionar a la primera
+
+       let icono = document.createElement("i");
+       if(p.tipo == "1"){
+         //Agregar el icono agua
+         //<i class="fas fa-tint"></i>
+         icono.classList.add("fas","fa-tint", "text-primary", "fa-2x");
+       } else if(p.tipo == "2"){
+         //Agregar el icono de fuego
+         //<i class="fas fa-fire"></i>
+         icono.classList.add("fas","fa-fire","text-danger","fa-2x");
+       } else if(p.tipo == "3"){
+         //Agregar icono de planta
+         //<i class="fab fa-envira"></i>
+         icono.classList.add("fab", "fa-envira", "text-success", "fa-2x");
+       }else{
+         //Agregar el icono de  electrico
+         //<i class="fas fa-bolt"></i>
+         icono.classList.add("fas","fa-bolt","text-warning", "fa-2x");
+       }
+       tdTipo.classList.add("text-center");
+       tdTipo.appendChild(icono);
+       
+
        tdDescripcion.innerHTML = p.descripcion;
        tdNro.innerText = i + 1;
        //TODO: Como agrego un boton para las acciones?
+       //Creo el boton
+       let boton = document.createElement("button");
+       boton.nro = i; //guardar cualquier cosa en un elemento HTML
+       boton.addEventListener("click", eliminar);
+       //Le agrego el texto al boton
+       boton.innerText = "Enviar al profe oak";
+       //Hago que el boton sea rojo
+       boton.classList.add("btn","btn-danger");
+       tdAcciones.classList.add("text-center");
+
+       //Como hacer que el boton elimine?
+
+       //Agrego el boton al td
+       tdAcciones.appendChild(boton);
+
        tr.appendChild(tdNro);
        tr.appendChild(tdNombre);
        tr.appendChild(tdTipo);
@@ -68,5 +113,5 @@ tinymce.init({
     //TODO: Como limitar la cantidad de pokemon?
     pokemones.push(pokemon);
     cargarTabla();
-    Swal.fire("Pokemon Registrado!!");
+    Swal.fire("Registro exitoso!","Pokemon Registrado!!", "info");
   });

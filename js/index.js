@@ -16,15 +16,25 @@ tinymce.init({
   });
   
   const pokemones = []; //Definir un arreglo en javascript
-  const eliminar  = function(){
+  const eliminar  = async function(){
     
-    //1. Saber que boton fue el que se apreto
-    //2. Sacar el nro del boton
-    let nro = this.nro;
-    //3. Eliminar el pokemon de la lista
-    pokemones.splice(nro,1);
-    //4. Recargar la tabla
-    cargarTabla();
+    let res = await Swal.fire({
+      title: "Desea enviar el pokemon al profesor oak?",
+      showCancelButton: true,
+      confirmButtonText: "Enviar!"
+    });
+    //La persona dijo que si?
+    if(res.isConfirmed){
+      //1. Saber que boton fue el que se apreto
+      //2. Sacar el nro del boton
+      let nro = this.nro;
+      //3. Eliminar el pokemon de la lista
+      pokemones.splice(nro,1);
+      //4. Recargar la tabla
+      cargarTabla();
+    }else{
+      Swal.fire("Operacion cancelada");
+    }
   };
 
   const cargarTabla  = ()=>{
@@ -104,14 +114,42 @@ tinymce.init({
     let descripcion = tinymce.get("descripcion-txt").getContent();
     let legendario = document.querySelector("#legendario-si").checked;
     let tipo = document.querySelector("#tipo-select").value;
+    let esValido = true;
+
+    document.querySelector("#nombre-txt").classList.remove("is-invalid");
+    document.querySelector("#descripcion-txt").classList.remove("is-invalid");
     
-    let pokemon = {};
-    pokemon.nombre = nombre;
-    pokemon.descripcion = descripcion;
-    pokemon.legendario = legendario;
-    pokemon.tipo = tipo;
-    //TODO: Como limitar la cantidad de pokemon?
-    pokemones.push(pokemon);
-    cargarTabla();
-    Swal.fire("Registro exitoso!","Pokemon Registrado!!", "info");
+    if(nombre.trim() == ""){ 
+      document.querySelector("#nombre-txt").classList.add("is-invalid");
+      esValido = false;
+    }
+
+    if(descripcion.trim() == ""){
+      document.querySelector("#descripcion-txt").classList.add("is-invalid");
+      esValido = false;
+    }
+
+    if(esValido){
+      let pokemon = {};
+      pokemon.nombre = nombre;
+      pokemon.descripcion = descripcion;
+      pokemon.legendario = legendario;
+      pokemon.tipo = tipo;
+      //TODO: Como limitar la cantidad de pokemon?
+      pokemones.push(pokemon);
+      cargarTabla();
+      Swal.fire("Registro exitoso!","Pokemon Registrado!!", "info");
+    }
+  });
+
+  document.querySelector("#limpiar-btn").addEventListener("click", ()=>{
+     //Limpiar los elementos
+     //Limpia un input text
+     document.querySelector("#nombre-txt").value = "";
+     //Limpiar un tinymce
+     tinymce.get("descripcion-txt").setContent("");
+     //Limpia un radiobutton (seleccionando la primera opcion)
+     document.querySelector("#legendario-si").checked = true;
+     //Limpia un select (tambien seleccionando la primera opcion)
+     document.querySelector("#tipo-select").value= "1";
   });
